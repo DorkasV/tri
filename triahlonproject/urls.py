@@ -19,9 +19,12 @@ from django.urls import include
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework import routers
+from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('docs/', include_docs_urls(title='Husky API')),
     path('triathlon/', include('triathlon.urls')),
     path('', RedirectView.as_view(url='/triathlon/', permanent=True)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -29,3 +32,21 @@ urlpatterns = [
 admin.site.site_header = "Triathlon Admin"
 admin.site.site_title = "Triathlon Admin Portal"
 admin.site.index_title = "Welcome to Triathlon Portal"
+
+from triathlon import views
+
+router = routers.DefaultRouter()
+router.register(r'athletes', views.AthleteViewSet)
+router.register(r'events', views.EventViewSet)
+router.register(r'results', views.ResultViewSet)
+router.register(r'distances', views.DistanceViewSet)
+router.register(r'groups', views.GroupViewSet)
+router.register(r'countries', views.CountryViewSet)
+router.register(r'cities', views.CityViewSet)
+
+# Wire up our API using automatic URL routing.
+# Additionally, we include login URLs for the browsable API.
+urlpatterns += [
+    path('api/', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+]

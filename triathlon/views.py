@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from triathlon.models import Athlete, Result, Event
+from triathlon.models import Athlete, Result, Event, Distance, Group, Country, City
 from django.views import generic
+from .serializers import AthleteSerializer, EventSerializer, ResultSerializer, DistanceSerializer, GroupSerializer, CountrySerializer, CitySerializer
+from rest_framework import viewsets
 
 def index(request):
     """View function for home page of site."""
@@ -49,3 +51,52 @@ class ResultListView(generic.ListView):
 class ResultDetailView(generic.DetailView):
     model = Result
     paginate_by = 10
+
+class AthleteViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows athletes to be viewed or edited.
+    """
+    queryset = Athlete.objects.all().order_by('-pk')
+    serializer_class = AthleteSerializer
+
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows events to be viewed or edited.
+    """
+    queryset = Event.objects.all().order_by('-pk')
+    serializer_class = EventSerializer
+
+class ResultViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows results to be viewed or edited.
+    """
+    queryset = Result.objects.all().order_by('-pk')
+    serializer_class = ResultSerializer
+
+class DistanceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows distances to be viewed or edited.
+    """
+    queryset = Distance.objects.all().order_by('-pk')
+    serializer_class = DistanceSerializer
+
+class GroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Group.objects.all().order_by('-pk')
+    serializer_class = GroupSerializer
+
+class CountryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows countries to be viewed or edited.
+    """
+    queryset = Country.objects.all().order_by('-pk')
+    serializer_class = CountrySerializer
+
+class CityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows cities to be viewed or edited.
+    """
+    queryset = City.objects.all().order_by('-pk')
+    serializer_class = CitySerializer

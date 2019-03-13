@@ -30,10 +30,10 @@ class ExportCsvMixin:
 
 @admin.register(Athlete)
 class AthleteAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ['first_name', 'last_name', 'birth_date', 'gender', 'event_count']
+    list_display = ['first_name', 'last_name', 'birth_date', 'gender', 'event_count', 'age']
     list_filter = ('gender',)
     search_fields = ['first_name', 'last_name']
-    readonly_fields = ['headshot_image']
+    readonly_fields = ['headshot_image', 'age']
 
     def headshot_image(self, obj):
         return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
@@ -83,7 +83,7 @@ class CityAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ['name', 'event_date', 'city', 'athlete_count']
+    list_display = ['name', 'event_date', 'city', 'athlete_count', 'race_over']
     # list_filter = ('country',)
     search_fields = ['name', 'city']
     autocomplete_fields = ['city', 'athlete']
@@ -106,77 +106,72 @@ class EventAdmin(admin.ModelAdmin, ExportCsvMixin):
 
 @admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):
-    list_display = ['athlete', 'total_place', 'group', 'group_place', 'swim_time', 'T1', 'bike_time', 'T2', 'run_time', 'total_time']
+    list_display = ['athlete', 'event', 'total_place', 'gender_place', 'group', 'group_place', 'swimming_time', 't1', 'biking_time', 't2', 'running_time', 'total_time']
     autocomplete_fields = ['event', 'athlete']
     list_filter = ['event',]
+    readonly_fields = ['total_time',]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         queryset = queryset.annotate(
-            _swim_time=F('swimming_time'),
-            _T1=F('transition1'),
-            _bike_time=F('biking_time'),
-            _T2=F('transition2'),
-            _run_time=F('running_time'),
-            _total_time=F('swimming_time') + F('transition1') + F('biking_time') + F('transition2') + F('running_time'),
-            _place=Max(F('swimming_time') + F('transition1') + F('biking_time') + F('transition2') + F('running_time')),
+            _place=Max(F('swimming_time') + F('t1') + F('biking_time') + F('t2') + F('running_time')),
         )
         return queryset
 
-    def swim_time(self, obj):
-        time = obj.swimming_time
-        hours = int(time)
-        minutes = (time*60) % 60
-        seconds = (time*3600) % 60
-        return "%d:%02d.%02d" % (hours, minutes, seconds)
+    # def swim_time(self, obj):
+    #     time = obj.swimming_time
+    #     hours = int(time)
+    #     minutes = (time*60) % 60
+    #     seconds = (time*3600) % 60
+    #     return "%d:%02d.%02d" % (hours, minutes, seconds)
 
-    swim_time.admin_order_field = '_swim_time'
+    # swim_time.admin_order_field = '_swim_time'
 
-    def T1(self, obj):
-        time = obj.transition1
-        hours = int(time)
-        minutes = (time*60) % 60
-        seconds = (time*3600) % 60
-        return "%d:%02d.%02d" % (hours, minutes, seconds)
+    # def T1(self, obj):
+    #     time = obj.transition1
+    #     hours = int(time)
+    #     minutes = (time*60) % 60
+    #     seconds = (time*3600) % 60
+    #     return "%d:%02d.%02d" % (hours, minutes, seconds)
 
-    T1.admin_order_field = '_T1'
+    # T1.admin_order_field = '_T1'
 
-    def bike_time(self, obj):
-        time = obj.biking_time
-        hours = int(time)
-        minutes = (time*60) % 60
-        seconds = (time*3600) % 60
-        return "%d:%02d.%02d" % (hours, minutes, seconds)
+    # def bike_time(self, obj):
+    #     time = obj.biking_time
+    #     hours = int(time)
+    #     minutes = (time*60) % 60
+    #     seconds = (time*3600) % 60
+    #     return "%d:%02d.%02d" % (hours, minutes, seconds)
 
-    bike_time.admin_order_field = '_bike_time'
+    # bike_time.admin_order_field = '_bike_time'
 
-    def T2(self, obj):
-        time = obj.transition2
-        hours = int(time)
-        minutes = (time*60) % 60
-        seconds = (time*3600) % 60
-        return "%d:%02d.%02d" % (hours, minutes, seconds)
+    # def T2(self, obj):
+    #     time = obj.transition2
+    #     hours = int(time)
+    #     minutes = (time*60) % 60
+    #     seconds = (time*3600) % 60
+    #     return "%d:%02d.%02d" % (hours, minutes, seconds)
 
-    T2.admin_order_field = '_T2'
+    # T2.admin_order_field = '_T2'
 
-    def run_time(self, obj):
-        time = obj.running_time
-        hours = int(time)
-        minutes = (time*60) % 60
-        seconds = (time*3600) % 60
-        return "%d:%02d.%02d" % (hours, minutes, seconds)
+    # def run_time(self, obj):
+    #     time = obj.running_time
+    #     hours = int(time)
+    #     minutes = (time*60) % 60
+    #     seconds = (time*3600) % 60
+    #     return "%d:%02d.%02d" % (hours, minutes, seconds)
 
-    run_time.admin_order_field = '_run_time'
+    # run_time.admin_order_field = '_run_time'
 
-    def total_time(self, obj):
-        time = obj.swimming_time + obj.transition1 + obj.biking_time + obj.transition2 + obj.running_time
-        hours = int(time)
-        minutes = (time*60) % 60
-        seconds = (time*3600) % 60
-        _total_time = "%d:%02d:%02d" % (hours, minutes, seconds)
-        return _total_time
+    # def total_time(self, obj):
+    #     time = obj.full_time#swimming_time + obj.transition1 + obj.biking_time + obj.transition2 + obj.running_time
+    #     hours = int(time)
+    #     minutes = (time*60) % 60
+    #     seconds = (time*3600) % 60
+    #     _total_time = "%d:%02d:%02d" % (hours, minutes, seconds)
+    #     return _total_time
 
-    total_time.admin_order_field = '_total_time'
+    # total_time.admin_order_field = '_total_time'
 
     def place(self, obj):
         return obj._place
