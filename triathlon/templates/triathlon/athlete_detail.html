@@ -1,0 +1,24 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Athlete: {{ athlete.first_name }} {{ athlete.last_name }}</h1>
+
+  <!--<p><strong>Athlete:</strong> <a href="">{{ athlete.first_name }} {{ athlete.last_name }}</a></p>  author detail link not yet defined -->
+  <p><strong>Country:</strong> {{ athlete.country }}</p>
+  <p><strong>Birth date:</strong> {{ athlete.birth_date }}</p> 
+  <!-- <p><strong>Genre:</strong> {% for genre in athlete.genre.all %} {{ genre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>   -->
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Events</h4>
+
+     {% for event in athlete.event.all %}
+      <hr>
+      <p class="text-default"><a href="{{ event.get_absolute_url }}">{{ event.name }}</a>, {{event.event_date}}, {{event.city}}</p>
+      <!-- {% if copy.status != 'a' %}
+        <p><strong>Due to be returned:</strong> {{copy.due_back}}</p>
+      {% endif %}
+      <p><strong>Imprint:</strong> {{copy.imprint}}</p>-->
+      <!-- <p class="text-muted"><strong>Id:</strong> {{event.id}}</p>  -->
+    {% endfor %} 
+  </div>
+{% endblock %}
