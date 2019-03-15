@@ -3,6 +3,8 @@ version: '2.3'
 services:
   web:
     build: .
+    volumes:
+      - ./.env:/work/app/.env:ro
 
   db:
     image: postgres:11
