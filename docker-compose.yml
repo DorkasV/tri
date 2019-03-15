@@ -6,7 +6,7 @@ services:
     volumes:
       - ./.env:/work/app/.env:ro
     ports:
-      - 5555:8000
+      - ${PORT}:8000
     restart: always
 
   db:
