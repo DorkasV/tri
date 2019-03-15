@@ -5,6 +5,8 @@ services:
     build: .
     volumes:
       - ./.env:/work/app/.env:ro
+    networks:
+      - prod
     ports:
       - ${PORT}:8000
     restart: always
