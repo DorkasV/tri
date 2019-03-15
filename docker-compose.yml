@@ -15,6 +15,10 @@ services:
       - db:/var/lib/postgresql/data
     networks:
       - prod
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     restart: always
 
 volumes:
