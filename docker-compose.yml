@@ -1,0 +1,27 @@
+version: '2.3'
+
+services:
+  web:
+    build: .
+    volumes:
+      - ./.env:/work/app/.env:ro
+    ports:
+      - 5555:8000
+    restart: always
+
+  db:
+    image: postgres:11
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - prod
+    restart: always
+
+volumes:
+  db:
+    external:
+      name: ${DB_VOLUME}
+
+networks:
+  prod:
+    external: true
