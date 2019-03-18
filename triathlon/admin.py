@@ -114,7 +114,7 @@ class ResultAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         queryset = queryset.annotate(
-            _place=Max(F('swimming_time') + F('t1') + F('biking_time') + F('t2') + F('running_time')),
+            # _place=Max(F('swimming_time') + F('t1') + F('biking_time') + F('t2') + F('running_time')),
         )
         return queryset
 
@@ -173,10 +173,10 @@ class ResultAdmin(admin.ModelAdmin):
 
     # total_time.admin_order_field = '_total_time'
 
-    def place(self, obj):
-        return obj._place
+    # def place(self, obj):
+    #     return obj._place
 
-    place.admin_order_field = '_place'
+    # place.admin_order_field = '_place'
 
 class FirstLetterListFilter(admin.SimpleListFilter):
     title = 'Group'
