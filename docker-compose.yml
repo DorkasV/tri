@@ -1,33 +1,77 @@
-version: '2.3'
+---
+version: "3.7"
+
+networks:
+  backend:
+    external:
+      name: ${BACKEND_NETWORK}
+
+volumes:
+  tridb:
+    external:
+      name: ${POSTGRES_VOLUME}
+  tristatic:
+    external:
+      name: ${STATIC_VOLUME}
 
 services:
-  web:
-    build: .
-    volumes:
-      - ./.env:/work/app/.env:ro
+
+  nginx:
+    image: nginx:1.14.2-alpine
     networks:
-      - prod
+      - backend
     ports:
-      - 80:8000
+      - 127.0.0.1:${NGINX_PORT}:80
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+      - tristatic:/app/static:ro
+    depends_on:
+      - triweb
+      - trivue
     restart: always
 
-  db:
+  triweb:
+    image: ${WEB_IMAGE}
+    build:
+      context: .
+    networks:
+      - backend
+    environment:
+      - SECRET_KEY
+      - DATABASE_URL
+      - TIME_ZONE
+      - DEBUG
+    volumes:
+      - tristatic:/app/static
+    depends_on:
+      - tridb
+    restart: always
+
+  tridb:
     image: postgres:11
     volumes:
-      - db:/var/lib/postgresql/data
+      - tridb:/var/lib/postgresql/data
     networks:
-      - prod
+      - backend
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
     restart: always
 
-volumes:
-  db:
-    external:
-      name: ${DB_VOLUME}
+  trivue:
+    image: ${VUE_IMAGE}
+    networks:
+      - backend
+    restart: always
 
-networks:
-  prod:
-    external: true
+  collectstatic:
+    image: ${WEB_IMAGE}
+    command: python manage.py collectstatic --noinput
+    networks:
+      - backend
+    volumes:
+      - tristatic:/app/static
+    restart: "no"
+
+...
