@@ -7,10 +7,10 @@ networks:
       name: ${BACKEND_NETWORK}
 
 volumes:
-  tridb:
+  db:
     external:
       name: ${POSTGRES_VOLUME}
-  tristatic:
+  static:
     external:
       name: ${STATIC_VOLUME}
 
@@ -24,13 +24,13 @@ services:
       - 127.0.0.1:${NGINX_PORT}:80
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
-      - tristatic:/app/static:ro
+      - static:/app/static:ro
     depends_on:
-      - triweb
-      - trivue
+      - web
+      - vue
     restart: always
 
-  triweb:
+  web:
     image: ${WEB_IMAGE}
     build:
       context: .
@@ -42,15 +42,15 @@ services:
       - TIME_ZONE
       - DEBUG
     volumes:
-      - tristatic:/app/static
+      - static:/app/static
     depends_on:
-      - tridb
+      - db
     restart: always
 
-  tridb:
+  db:
     image: postgres:11
     volumes:
-      - tridb:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     networks:
       - backend
     environment:
@@ -59,7 +59,7 @@ services:
       - POSTGRES_DB
     restart: always
 
-  trivue:
+  vue:
     image: ${VUE_IMAGE}
     networks:
       - backend
@@ -71,7 +71,7 @@ services:
     networks:
       - backend
     volumes:
-      - tristatic:/app/static
+      - static:/app/static
     restart: "no"
 
 ...
