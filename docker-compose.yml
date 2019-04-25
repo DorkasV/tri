@@ -24,7 +24,7 @@ services:
       - 127.0.0.1:${NGINX_PORT}:80
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
-      - static:/app/statics:ro
+      - static:/static:ro
     depends_on:
       - api
       - web
@@ -41,8 +41,6 @@ services:
       - DATABASE_URL
       - TIME_ZONE
       - DEBUG
-    # volumes:
-    #   - static:/app/staticc
     depends_on:
       - db
     restart: always
@@ -71,7 +69,9 @@ services:
     networks:
       - backend
     volumes:
-      - static:/app/statics
+      - static:/static
+    environment:
+      - STATIC_ROOT=/static/api/statics
     restart: "no"
 
 ...
