@@ -1,0 +1,20 @@
+{
+	"folders":
+	[
+		{
+			"file_exclude_patterns":
+			[
+				"*.sqlite3"
+			],
+			"folder_exclude_patterns":
+			[
+				"**/__pycache__",
+				"htmlcov",
+				"static",
+				"media",
+				"venv"
+			],
+			"path": "."
+		}
+	]
+}
