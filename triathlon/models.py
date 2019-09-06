@@ -39,10 +39,38 @@ class City(models.Model):
     def __str__(self):
         return "%s, %s" % (self.name, self.country)
 
+class Team(models.Model):
+    name = models.CharField(max_length=50)
+
+    city = models.ForeignKey(
+        City,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return "%s, %s" % (self.name, self.city)
+
+class Coach(models.Model):
+    name = models.CharField(max_length=50)
+    class Meta:
+        verbose_name_plural = 'Coaches'
+
+    def __str__(self):
+        return self.name
+
+class BikeType(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
 class Athlete(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    birth_date = models.DateField('birth date')
+    nick_name = models.CharField(max_length=50, null=True, blank=True)
+    birth_date = models.DateField('birth date', null=True, blank=True)
     age = models.IntegerField(null=True, blank=True,)
     
     MALE = 'M'
@@ -57,10 +85,51 @@ class Athlete(models.Model):
         default=MALE,
     )
 
-    country = models.ForeignKey(
-        Country,
+    city = models.ForeignKey(
+        City,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+    )
+
+    team = models.ForeignKey(
+        Team,
+        related_name='athlete',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    swim_coach = models.ForeignKey(
+        Coach,
+        related_name='swim_coach',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    bike_coach = models.ForeignKey(
+        Coach,
+        related_name='bike_coach',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    run_coach = models.ForeignKey(
+        Coach,
+        related_name='run_coach',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    triathlon_coach = models.ForeignKey(
+        Coach,
+        related_name='triathlon_coach',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
 
     headshot = models.ImageField(null=True, blank=True, upload_to="athlete_headshots/")
@@ -99,10 +168,22 @@ class Event(models.Model):
         now = datetime(timezone.now().year, timezone.now().month, timezone.now().day)
         d = self.event_date
         dt = datetime(d.year, d.month, d.day)
-        return now <= dt <= now
+        return dt <= now
     race_over.admin_order_field = 'event_date'
     race_over.boolean = True
     race_over.short_description = 'Race over?'
+
+    OPEN_WATER = 'O'
+    IN_POOL = 'P'
+    CHOICES = (
+        (OPEN_WATER, 'Open water'),
+        (IN_POOL, 'In pool'),
+    )
+    swim = models.CharField(
+        max_length=1,
+        choices=CHOICES,
+        default=OPEN_WATER,
+    )
 
     def __str__(self):
         return "%s %s" % (self.name, self.city)
@@ -141,9 +222,42 @@ class Result(models.Model):
         null=True,
     )
 
-    total_place = models.CharField(max_length=10, blank=True)
-    gender_place = models.CharField(max_length=10, blank=True)
-    group_place = models.CharField(max_length=10, blank=True)
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    total_place = models.IntegerField(null=True, blank=True)
+    gender_place = models.IntegerField(null=True, blank=True)
+    group_place = models.IntegerField(null=True, blank=True)
+
+    total_swim_place = models.IntegerField(null=True, blank=True)
+    gender_swim_place = models.IntegerField(null=True, blank=True)
+    group_swim_place = models.IntegerField(null=True, blank=True)
+
+    total_bike_place = models.IntegerField(null=True, blank=True)
+    total_place_after_bike = models.IntegerField(null=True, blank=True)
+    gender_bike_place = models.IntegerField(null=True, blank=True)
+    gender_place_after_bike = models.IntegerField(null=True, blank=True)
+    group_bike_place = models.IntegerField(null=True, blank=True)
+    group_place_after_bike = models.IntegerField(null=True, blank=True)
+
+    total_run_place = models.IntegerField(null=True, blank=True)
+    gender_run_place = models.IntegerField(null=True, blank=True)
+    group_run_place = models.IntegerField(null=True, blank=True)
+
+    points = models.IntegerField(null=True, blank=True)
+
+    bike_type = models.ForeignKey(
+        BikeType,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    bike_model = models.CharField(max_length=100, blank=True, null=True)
+    run_shoes_model = models.CharField(max_length=100, blank=True, null=True)
 
     swimming_time = models.DurationField(blank=True, null=True)
     t1 = models.DurationField(blank=True, null=True)
@@ -166,3 +280,6 @@ class Result(models.Model):
     def save(self, *args, **kwargs):
         self.total_time = self.get_total_time()
         super(Result, self).save(*args, **kwargs)
+
+    # class Meta:
+    #     ordering = ['total_place']

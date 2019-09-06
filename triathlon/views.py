@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from triathlon.models import Athlete, Result, Event, Distance, Group, Country, City
+from triathlon.models import Athlete, Result, Event, Distance, Group, Country, City, Team
 from django.views import generic
-from .serializers import AthleteSerializer, EventSerializer, ResultSerializer, DistanceSerializer, GroupSerializer, CountrySerializer, CitySerializer
+from .serializers import AthleteSerializer, EventSerializer, ResultSerializer, DistanceSerializer, GroupSerializer, CountrySerializer, CitySerializer, TeamSerializer
 from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import pagination, response
 
 def index(request):
     """View function for home page of site."""
@@ -52,26 +54,72 @@ class ResultDetailView(generic.DetailView):
     model = Result
     paginate_by = 10
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'per_page'
+    max_page_size = 1000
+
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'per_page'
+    # max_page_size = 100
+
+    # Paginate in the style defined by vuetable2
+    def get_paginated_response(self, data):
+
+        # Get id's of records in current page
+        firstRecord = data[0]['id'] if (data and 'id' in data[0]) else None
+        lastRecord = data[-1]['id'] if (data and 'id' in data[0]) else None
+
+        return response.Response({
+            'pagination': {
+                'total': self.page.paginator.count,
+                'per_page': self.get_page_size(self.request),
+                'current_page': self.request.query_params.get('page', None),
+                'last_page': self.page.paginator.num_pages,
+                'next_page_url': self.get_next_link(),
+                'previous_page_url': self.get_previous_link(),
+                "from": firstRecord,
+                "to": lastRecord,
+            },
+            'data': data
+        })
+
 class AthleteViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows athletes to be viewed or edited.
     """
-    queryset = Athlete.objects.all().order_by('-pk')
+    queryset = Athlete.objects.all().order_by('pk')
     serializer_class = AthleteSerializer
+    pagination_class = CustomPagination
+
+    filterset_fields = [
+        'event', 'team'
+    ]
 
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed or edited.
     """
-    queryset = Event.objects.all().order_by('-pk')
+    queryset = Event.objects.all().order_by('pk')
     serializer_class = EventSerializer
+    pagination_class = CustomPagination
+
+    filterset_fields = [
+        'athlete',
+    ]
 
 class ResultViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows results to be viewed or edited.
     """
-    queryset = Result.objects.all().order_by('-pk')
+    queryset = Result.objects.all().order_by('total_place')
     serializer_class = ResultSerializer
+    pagination_class = CustomPagination
+
+    filterset_fields = [
+        'event', 'athlete', 'team', 'distance'
+    ]
 
 class DistanceViewSet(viewsets.ModelViewSet):
     """
@@ -100,3 +148,15 @@ class CityViewSet(viewsets.ModelViewSet):
     """
     queryset = City.objects.all().order_by('-pk')
     serializer_class = CitySerializer
+
+class TeamViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows teams to be viewed or edited.
+    """
+    queryset = Team.objects.all().order_by('pk')
+    serializer_class = TeamSerializer
+    pagination_class = CustomPagination
+
+    filterset_fields = [
+        'athlete',
+    ]

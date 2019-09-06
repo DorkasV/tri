@@ -24,7 +24,7 @@ from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('docs/', include_docs_urls(title='Husky API')),
+    path('docs/', include_docs_urls(title='Tri API')),
     path('triathlon/', include('triathlon.urls')),
     path('', RedirectView.as_view(url='/triathlon/', permanent=True)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -43,6 +43,7 @@ router.register(r'distances', views.DistanceViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'countries', views.CountryViewSet)
 router.register(r'cities', views.CityViewSet)
+router.register(r'teams', views.TeamViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

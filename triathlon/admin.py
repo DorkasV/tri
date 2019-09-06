@@ -7,8 +7,9 @@ from django.utils.safestring import mark_safe
 
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
+from import_export.admin import ImportExportModelAdmin
 
-from .models import Athlete, Country, City, Event, Result, Group, Distance
+from .models import Athlete, Country, City, Event, Result, Group, Distance, Team, Coach, BikeType
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
@@ -29,10 +30,11 @@ class ExportCsvMixin:
     export_as_csv.short_description = "Export Selected"
 
 @admin.register(Athlete)
-class AthleteAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ['first_name', 'last_name', 'birth_date', 'gender', 'event_count', 'age']
+class AthleteAdmin(ImportExportModelAdmin, admin.ModelAdmin, ExportCsvMixin):
+    list_display = ['id', 'first_name', 'last_name', 'nick_name', 'birth_date', 'city', 'gender', 'event_count', 'age', 'team', 'swim_coach', 'bike_coach', 'run_coach', 'triathlon_coach']
     list_filter = ('gender',)
-    search_fields = ['first_name', 'last_name']
+    list_display_links = ['first_name']
+    search_fields = ['first_name', 'last_name', 'nick_name']
     readonly_fields = ['headshot_image', 'age']
 
     def headshot_image(self, obj):
@@ -75,15 +77,37 @@ class CountryAdmin(admin.ModelAdmin):
 
     city_count.admin_order_field = '_city_count'
 
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'city', 'athlete_count']
+    list_display_links = ['name']
+    list_filter = ('city__name',)
+    search_fields = ['name']
+
+    def athlete_count(self, obj):
+        return obj.athlete.count()
+
+@admin.register(Coach)
+class CoachAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+@admin.register(BikeType)
+class BikeTypeAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
 @admin.register(City)
-class CityAdmin(admin.ModelAdmin):
+class CityAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_display = ['name', 'country']
     list_filter = ('country__name',)
     search_fields = ['name']
 
+    actions = ["export_as_csv"]
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ['name', 'event_date', 'city', 'athlete_count', 'race_over']
+    list_display = ['name', 'event_date', 'city', 'athlete_count', 'swim', 'race_over']
     # list_filter = ('country',)
     search_fields = ['name', 'city']
     autocomplete_fields = ['city', 'athlete']
@@ -105,11 +129,16 @@ class EventAdmin(admin.ModelAdmin, ExportCsvMixin):
     actions = ["export_as_csv"]
 
 @admin.register(Result)
-class ResultAdmin(admin.ModelAdmin):
-    list_display = ['athlete', 'event', 'total_place', 'gender_place', 'group', 'group_place', 'swimming_time', 't1', 'biking_time', 't2', 'running_time', 'total_time']
+class ResultAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ['id', 'athlete', 'event', 'group', 'distance', 'team', 'total_place', 'group_place', 'gender_place', 'bike_type', 'bike_model', 
+    'total_swim_place', 'gender_swim_place', 'group_swim_place',
+    'total_bike_place', 'total_place_after_bike', 'gender_bike_place', 'gender_place_after_bike', 'group_bike_place', 'group_place_after_bike',
+    'total_run_place', 'gender_run_place', 'group_run_place',
+    'run_shoes_model', 'swimming_time', 't1', 'biking_time', 't2', 'running_time', 'total_time', 'points']
     autocomplete_fields = ['event', 'athlete']
     list_filter = ['event',]
     readonly_fields = ['total_time',]
+    list_display_links = ['athlete']
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
