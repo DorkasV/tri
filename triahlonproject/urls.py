@@ -24,9 +24,8 @@ from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('docs/', include_docs_urls(title='Tri API')),
     path('triathlon/', include('triathlon.urls')),
-    path('', RedirectView.as_view(url='/triathlon/', permanent=True)),
+    # path('', RedirectView.as_view(url='/triathlon/', permanent=True)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 admin.site.site_header = "Triathlon Admin"
@@ -50,4 +49,5 @@ router.register(r'teams', views.TeamViewSet)
 urlpatterns += [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api/docs/', include_docs_urls(title='Tri API')),
 ]
