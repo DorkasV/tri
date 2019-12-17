@@ -106,6 +106,7 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     pagination_class = CustomPagination
 
+    search_fields = ['name']
     filterset_fields = [
         'athlete',
     ]
