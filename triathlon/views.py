@@ -93,6 +93,7 @@ class AthleteViewSet(viewsets.ModelViewSet):
     serializer_class = AthleteSerializer
     pagination_class = CustomPagination
 
+    search_fields = ['first_name', 'last_name']
     filterset_fields = [
         'event', 'team'
     ]
@@ -117,6 +118,7 @@ class ResultViewSet(viewsets.ModelViewSet):
     serializer_class = ResultSerializer
     pagination_class = CustomPagination
 
+    search_fields = ['event__name', 'athlete__first_name', 'athlete__last_name', 'team__name']
     filterset_fields = [
         'event', 'athlete', 'team', 'distance'
     ]
@@ -157,6 +159,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamSerializer
     pagination_class = CustomPagination
 
+    search_fields = ['name']
     filterset_fields = [
         'athlete',
     ]
