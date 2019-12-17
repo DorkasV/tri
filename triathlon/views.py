@@ -115,7 +115,7 @@ class ResultViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows results to be viewed or edited.
     """
-    queryset = Result.objects.all().order_by('total_place')
+    queryset = Result.objects.all().order_by('-event__event_date')
     serializer_class = ResultSerializer
     pagination_class = CustomPagination
 
