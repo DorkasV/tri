@@ -119,7 +119,7 @@ class ResultViewSet(viewsets.ModelViewSet):
     serializer_class = ResultSerializer
     pagination_class = CustomPagination
 
-    search_fields = ['event__name', 'athlete__first_name', 'athlete__last_name', 'team__name']
+    search_fields = ['event__name', 'event__event_date', 'athlete__first_name', 'athlete__last_name', 'team__name']
     filterset_fields = [
         'event', 'athlete', 'team', 'distance'
     ]
