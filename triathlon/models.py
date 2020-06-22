@@ -273,12 +273,12 @@ class Result(models.Model):
         """Returns the url to access a particular instance of MyModelName."""
         return reverse('result-detail', args=[str(self.id)])
 
-    def get_total_time(self):
-        "Returns total time."
-        return self.swimming_time + self.t1 + self.biking_time + self.t2 + self.running_time
+    # def get_total_time(self):
+    #     "Returns total time."
+    #     return self.swimming_time + self.t1 + self.biking_time + self.t2 + self.running_time
 
     def save(self, *args, **kwargs):
-        self.total_time = self.get_total_time()
+        # self.total_time = self.get_total_time()
         super(Result, self).save(*args, **kwargs)
 
     # class Meta:

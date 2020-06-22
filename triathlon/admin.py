@@ -137,7 +137,7 @@ class ResultAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     'run_shoes_model', 'swimming_time', 't1', 'biking_time', 't2', 'running_time', 'total_time', 'points']
     autocomplete_fields = ['event', 'athlete']
     list_filter = ['event',]
-    readonly_fields = ['total_time',]
+    # readonly_fields = ['total_time',]
     list_display_links = ['athlete']
 
     def get_queryset(self, request):
