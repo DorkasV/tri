@@ -121,7 +121,7 @@ class ResultViewSet(viewsets.ModelViewSet):
 
     search_fields = ['event__name', 'event__event_date', 'athlete__first_name', 'athlete__last_name', 'team__name']
     filterset_fields = [
-        'event', 'athlete', 'team', 'distance'
+        'event', 'athlete', 'team', 'distance', 'group'
     ]
 
 class DistanceViewSet(viewsets.ModelViewSet):
