@@ -102,7 +102,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed or edited.
     """
-    queryset = Event.objects.all().order_by('event_date')
+    queryset = Event.objects.all().order_by('-event_date')
     serializer_class = EventSerializer
     pagination_class = CustomPagination
 
