@@ -193,7 +193,7 @@ class Event(models.Model):
         return reverse('event-detail', args=[str(self.id)])
 
     class Meta:
-        ordering = ['-event_date']
+        ordering = ['event_date']
 
 class Result(models.Model):
     event = models.ForeignKey(
